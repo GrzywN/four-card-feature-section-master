@@ -35,6 +35,12 @@ $animation-duration: 500ms;
   padding: 0;
 }
 
+.js-loading *,
+.js-loading *:before,
+.js-loading *:after {
+  animation-play-state: paused !important;
+}
+
 body {
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
