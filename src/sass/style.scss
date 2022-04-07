@@ -1,30 +1,55 @@
-@use 'sass:math';
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600&display=swap');
 
-$color-red: hsl(0, 78%, 62%);
-$color-cyan: hsl(180, 62%, 55%);
-$color-orange: hsl(34, 97%, 64%);
-$color-blue: hsl(212, 86%, 64%);
+@function toRem($value-in-pixels) {
+  @return calc(#{$value-in-pixels}rem / 16);
+}
+
+$colors-primary: (
+  'red': hsl(0, 78%, 62%),
+  'cyan': hsl(180, 62%, 55%),
+  'orange': hsl(34, 97%, 64%),
+  'blue': hsl(212, 86%, 64%),
+);
 
 $color-very-dark-blue: hsl(234, 12%, 34%);
 $color-grayish-blue: hsl(229, 6%, 66%);
 $color-very-light-gray: hsl(0, 0%, 98%);
 
+$medium-breakpoint: toRem(711);
+$large-breakpoint: toRem(1046);
+$x-large-breakpoint: 100em;
+$xx-large-breakpoint: 200em;
+
 $animation-duration: 500ms;
 
-@mixin slideInFromLeftanimation {
+@mixin medium {
+  @media screen and (min-width: $medium-breakpoint) and (max-width: $large-breakpoint) {
+    @content;
+  }
+}
+
+@mixin large {
+  @media screen and (min-width: $large-breakpoint) {
+    @content;
+  }
+}
+
+@mixin x-large {
+  @media screen and (min-width: $x-large-breakpoint) {
+    @content;
+  }
+}
+
+@mixin xx-large {
+  @media screen and (min-width: $xx-large-breakpoint) {
+    @content;
+  }
+}
+
+%slideInFromLeftanimation {
   animation: forwards slideInFromLeft $animation-duration linear;
   opacity: 0;
   transform: translateX(-5%);
-}
-
-@mixin calculateAnimationDelay($multiplyBy: 1) {
-  animation-delay: $animation-duration * $multiplyBy;
-}
-
-@function toRem($value-in-pixels) {
-  @return calc(#{$value-in-pixels}rem / 16);
 }
 
 *,
@@ -36,9 +61,18 @@ $animation-duration: 500ms;
 }
 
 .js-loading *,
-.js-loading *:before,
-.js-loading *:after {
+.js-loading *::before,
+.js-loading *::after {
   animation-play-state: paused !important;
+}
+
+html {
+  @include x-large {
+    font-size: clamp(1em, 1em + 0.25vw, 1.25em);
+  }
+  @include xx-large {
+    font-size: clamp(1em, 1em + 1vw, 2em);
+  }
 }
 
 body {
@@ -52,6 +86,9 @@ body {
   padding-left: 2em;
   padding-right: 2em;
   padding-bottom: toRem(78);
+  @include large {
+    padding-top: toRem(80);
+  }
 }
 
 .header {
@@ -65,10 +102,10 @@ body {
     line-height: 140%;
     &--strong {
       font-weight: 600;
-      @include slideInFromLeftanimation();
-      @include calculateAnimationDelay(1);
+      animation-delay: $animation-duration;
+      @extend %slideInFromLeftanimation;
     }
-    @include slideInFromLeftanimation();
+    @extend %slideInFromLeftanimation;
   }
   &__paragraph {
     margin-top: 1rem;
@@ -77,13 +114,22 @@ body {
     font-weight: 400;
     line-height: toRem(25);
     letter-spacing: 0.1px;
-    @include slideInFromLeftanimation();
-    @include calculateAnimationDelay(2);
+    animation-delay: $animation-duration * 2;
+    @extend %slideInFromLeftanimation;
+  }
+  @include large {
+    &__heading {
+      font-size: toRem(36);
+      letter-spacing: 0.25px;
+    }
   }
 }
 
 main {
   margin-top: toRem(76);
+  @include large {
+    margin-top: 4rem;
+  }
 }
 
 .grid {
@@ -99,6 +145,25 @@ main {
   }
   & > .card {
     align-self: center;
+  }
+  @include medium {
+    display: flex;
+    flex-flow: row wrap;
+    & > .card {
+      align-self: unset;
+    }
+    &__double-row {
+      flex-direction: row;
+    }
+  }
+  @include large {
+    flex-direction: row;
+    gap: toRem(30);
+    &__double-row {
+      display: flex;
+      flex-direction: column;
+      gap: toRem(30);
+    }
   }
 }
 
@@ -118,15 +183,15 @@ main {
   box-shadow: transparentize(#d6e0ee, 0.25) 0px toRem(14) toRem(28),
     transparentize(#d6e0ee, 0.22) 0px toRem(10) toRem(10);
   position: relative;
-  @include slideInFromLeftanimation();
+  @extend %slideInFromLeftanimation;
   &--2 {
-    @include calculateAnimationDelay();
+    animation-delay: $animation-duration;
   }
   &--3 {
-    @include calculateAnimationDelay(2);
+    animation-delay: $animation-duration * 2;
   }
   &--4 {
-    @include calculateAnimationDelay(3);
+    animation-delay: $animation-duration * 3;
   }
   &::after {
     content: '';
@@ -136,18 +201,13 @@ main {
     width: 100%;
     height: toRem(3.55);
   }
-  &--red::after {
-    background-color: $color-red;
+
+  @each $key, $val in $colors-primary {
+    &--#{$key}::after {
+      background-color: $val;
+    }
   }
-  &--cyan::after {
-    background-color: $color-cyan;
-  }
-  &--orange::after {
-    background-color: $color-orange;
-  }
-  &--blue::after {
-    background-color: $color-blue;
-  }
+
   &__heading {
     color: $color-very-dark-blue;
     font-size: toRem(20);
@@ -170,44 +230,7 @@ main {
     width: toRem(57);
     height: auto;
   }
-}
-
-@media screen and (min-width: toRem(711)) and (max-width: toRem(1046)) {
-  .grid {
-    display: flex;
-    flex-flow: row wrap;
-    & > .card {
-      align-self: unset;
-    }
-    &__double-row {
-      flex-direction: row;
-    }
-  }
-}
-
-@media screen and (min-width: toRem(1046)) {
-  body {
-    padding-top: toRem(80);
-  }
-  .header {
-    &__heading {
-      font-size: toRem(36);
-      letter-spacing: 0.25px;
-    }
-  }
-  main {
-    margin-top: 4rem;
-  }
-  .grid {
-    flex-direction: row;
-    gap: toRem(30);
-    &__double-row {
-      display: flex;
-      flex-direction: column;
-      gap: toRem(30);
-    }
-  }
-  .card {
+  @include large {
     max-width: toRem(350);
     height: toRem(250);
     padding: 2em;
@@ -219,18 +242,6 @@ main {
       width: 4em;
       height: auto;
     }
-  }
-}
-
-@media screen and (min-width: 100em) {
-  html {
-    font-size: clamp(1em, 1em + 0.25vw, 1.25em);
-  }
-}
-
-@media screen and (min-width: 200em) {
-  html {
-    font-size: clamp(1em, 1em + 1vw, 2em);
   }
 }
 
