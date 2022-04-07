@@ -14,9 +14,9 @@ $color-very-light-gray: hsl(0, 0%, 98%);
 $animation-duration: 500ms;
 
 @mixin slideInFromLeftanimation {
-  // animation: forwards slideInFromLeft $animation-duration linear;
-  // opacity: 0;
-  // transform: translateX(-5%);
+  animation: forwards slideInFromLeft $animation-duration linear;
+  opacity: 0;
+  transform: translateX(-5%);
 }
 
 @mixin calculateAnimationDelay($multiplyBy: 1) {
